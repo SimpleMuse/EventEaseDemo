@@ -1,0 +1,27 @@
+.table-registrations, .table-totals {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+}
+
+.table-registrations th, .table-registrations td,
+.table-totals th, .table-totals td {
+    border: 1px solid #e9ecef;
+    padding: 10px 12px;
+    text-align: left;
+}
+
+.table-registrations thead th, .table-totals thead th {
+    background: #f1f5f9;
+    font-weight: 700;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+@media (max-width: 600px) {
+    .table-registrations, .table-totals {
+        font-size: 0.9rem;
+    }
+}

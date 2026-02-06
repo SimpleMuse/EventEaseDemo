@@ -1,0 +1,36 @@
+.session-info[b-p3jsb5w98q] {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+}
+
+.session-info h3[b-p3jsb5w98q] {
+    margin-top: 0;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.session-details p[b-p3jsb5w98q] {
+    margin: 8px 0;
+    font-size: 0.9rem;
+}
+
+.recent-events[b-p3jsb5w98q] {
+    margin-top: 12px;
+}
+
+.recent-events ul[b-p3jsb5w98q] {
+    margin: 8px 0;
+    padding-left: 20px;
+}
+
+.recent-events li[b-p3jsb5w98q] {
+    margin: 4px 0;
+}
+
+.btn-sm[b-p3jsb5w98q] {
+    padding: 6px 12px;
+    font-size: 0.875rem;
+}

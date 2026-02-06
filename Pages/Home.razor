@@ -1,0 +1,36 @@
+﻿@page "/"
+@using EventEase.Models
+@using EventEase.Components
+@using EventEase.Services
+@inject EventService EventService
+@inject UserSessionService SessionService
+
+<PageTitle>Home</PageTitle>
+
+<h1>Upcoming Events</h1>
+<p>Discover and register for exciting events happening near you.</p>
+
+<div class="home-layout">
+    <div class="events-section">
+        <div class="events-container">
+            @foreach (var evt in events)
+            {
+                <EventCard Event="@evt" />
+            }
+        </div>
+    </div>
+    
+    <aside class="sidebar-section">
+        <SessionInfo />
+    </aside>
+</div>
+
+@code {
+    private List<Event> events = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SessionService.InitializeAsync();
+        events = EventService.GetAllEvents();
+    }
+}

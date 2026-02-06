@@ -1,0 +1,97 @@
+@page "/admin"
+@using EventEase.Services
+@using EventEase.Models
+@inject RegistrationService RegistrationService
+@inject EventService EventService
+@implements IDisposable
+
+<PageTitle>Admin - Registrations</PageTitle>
+
+<h1>Registrations</h1>
+
+@code {
+    private List<Registration> registrations = new();
+    private List<Event> events = new();
+    private Dictionary<int, Event> eventLookup = new();
+    private List<(Event? Event, int Count)> totals = new();
+
+    protected override void OnInitialized()
+    {
+        events = EventService.GetAllEvents();
+        eventLookup = events.ToDictionary(e => e.Id);
+        LoadRegistrations();
+        RegistrationService.RegistrationsChanged += OnRegistrationsChanged;
+    }
+
+    private void LoadRegistrations()
+    {
+        registrations = RegistrationService.GetAll();
+        totals = registrations
+            .GroupBy(r => r.EventId)
+            .Select(g => (Event: eventLookup.GetValueOrDefault(g.Key), Count: g.Count()))
+            .OrderByDescending(x => x.Count)
+            .ToList();
+    }
+
+    private void OnRegistrationsChanged()
+    {
+        LoadRegistrations();
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        RegistrationService.RegistrationsChanged -= OnRegistrationsChanged;
+    }
+}
+
+@if (registrations == null || registrations.Count == 0)
+{
+    <p>No registrations yet.</p>
+}
+else
+{
+    <h2>Totals by Event</h2>
+
+    <table class="table-totals">
+        <thead>
+            <tr>
+                <th>Event</th>
+                <th>Registrations</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in totals)
+            {
+                <tr>
+                    <td>@(t.Event?.Name ?? "Unknown")</td>
+                    <td>@t.Count</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h2>Registrations</h2>
+
+    <table class="table-registrations">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Event</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in registrations)
+            {
+                <tr>
+                    <td>@r.Id</td>
+                    <td>@r.Name</td>
+                    <td>@r.Email</td>
+                    <td>@(eventLookup.GetValueOrDefault(r.EventId)?.Name ?? "Unknown")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

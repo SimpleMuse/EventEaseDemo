@@ -1,0 +1,24 @@
+@using EventEase.Models
+
+<div class="event-card">
+    <div class="event-header">
+        <h3>@Event.Name</h3>
+    </div>
+    <div class="event-body">
+        <p class="event-date">
+            <strong>📅 Date:</strong> @Event.Date.ToString("MMMM dd, yyyy")
+        </p>
+        <p class="event-location">
+            <strong>📍 Location:</strong> @Event.Location
+        </p>
+    </div>
+    <div class="event-footer">
+        <NavLink href="@($"event-details/{Event.Id}")" class="btn btn-info">View Details</NavLink>
+        <NavLink href="@($"register/{Event.Id}")" class="btn btn-primary">Register</NavLink>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Event Event { get; set; }
+}

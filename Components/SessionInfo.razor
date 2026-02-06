@@ -1,0 +1,78 @@
+@using EventEase.Services
+@using EventEase.Models
+@inject UserSessionService SessionService
+@inject EventService EventService
+@implements IDisposable
+
+<div class="session-info">
+    <h3>Session Info</h3>
+    <div class="session-details">
+        <p><strong>Session ID:</strong> @session?.SessionId.Substring(0, 8)...</p>
+        <p><strong>Session Duration:</strong> @GetDurationString()</p>
+        <p><strong>Last Activity:</strong> @session?.LastActivity.ToString("hh:mm:ss tt")</p>
+        
+        @if (recentEvents.Any())
+        {
+            <div class="recent-events">
+                <strong>Recently Viewed:</strong>
+                <ul>
+                    @foreach (var evt in recentEvents.Take(5))
+                    {
+                        <li><a href="/event-details/@evt.Id">@evt.Name</a></li>
+                    }
+                </ul>
+            </div>
+        }
+        
+        <button class="btn btn-secondary btn-sm" @onclick="ClearSession">Clear Session</button>
+    </div>
+</div>
+
+@code {
+    private UserSession? session;
+    private List<Event> recentEvents = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SessionService.InitializeAsync();
+        LoadSessionData();
+        SessionService.OnSessionChanged += OnSessionChanged;
+    }
+
+    private void LoadSessionData()
+    {
+        session = SessionService.GetSession();
+        var allEvents = EventService.GetAllEvents();
+        recentEvents = SessionService.GetRecentlyViewedEventIds()
+            .Select(id => allEvents.FirstOrDefault(e => e.Id == id))
+            .Where(e => e != null)
+            .ToList()!;
+    }
+
+    private void OnSessionChanged()
+    {
+        LoadSessionData();
+        StateHasChanged();
+    }
+
+    private string GetDurationString()
+    {
+        var duration = session?.GetSessionDuration() ?? TimeSpan.Zero;
+        if (duration.TotalHours >= 1)
+            return $"{(int)duration.TotalHours}h {duration.Minutes}m";
+        else if (duration.TotalMinutes >= 1)
+            return $"{(int)duration.TotalMinutes}m {duration.Seconds}s";
+        else
+            return $"{duration.Seconds}s";
+    }
+
+    private async Task ClearSession()
+    {
+        await SessionService.ClearSessionAsync();
+    }
+
+    public void Dispose()
+    {
+        SessionService.OnSessionChanged -= OnSessionChanged;
+    }
+}

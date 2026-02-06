@@ -1,0 +1,47 @@
+.confirmation[b-ki69whb3qe] {
+    text-align: center;
+    padding: 30px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.form-row[b-ki69whb3qe] {
+    margin-bottom: 16px;
+}
+
+.form-row label[b-ki69whb3qe] {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.form-control[b-ki69whb3qe] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+}
+
+.form-actions[b-ki69whb3qe] {
+    margin-top: 20px;
+    display: flex;
+    gap: 8px;
+}
+
+.btn[b-ki69whb3qe] {
+    padding: 10px 16px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary[b-ki69whb3qe] {
+    background: #007bff;
+    color: white;
+}
+
+.btn-secondary[b-ki69whb3qe] {
+    background: #6c757d;
+    color: white;
+}

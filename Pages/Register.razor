@@ -1,0 +1,111 @@
+@page "/register"
+@page "/register/{EventId:int}"
+@using System.ComponentModel.DataAnnotations
+@using EventEase.Models
+@using EventEase.Services
+@inject EventService EventService
+@inject RegistrationService RegistrationService
+@inject NavigationManager Navigation
+
+<PageTitle>Register</PageTitle>
+
+<h1>Register for an Event</h1>
+
+@if (submitted)
+{
+    <div class="confirmation">
+        <h2>Registration Complete</h2>
+        <p>Thanks, <strong>@registrationModel.Name</strong>! You are registered for <strong>@selectedEvent?.Name</strong>.</p>
+        <a href="/" class="btn btn-secondary">Back to Home</a>
+    </div>
+}
+else
+{
+    <EditForm Model="registrationModel" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-row">
+            <label>Name</label>
+            <InputText @bind-Value="registrationModel.Name" class="form-control" />
+            <ValidationMessage For="() => registrationModel.Name" />
+        </div>
+
+        <div class="form-row">
+            <label>Email</label>
+            <InputText @bind-Value="registrationModel.Email" class="form-control" />
+            <ValidationMessage For="() => registrationModel.Email" />
+        </div>
+
+        <div class="form-row">
+            <label>Event</label>
+            <InputSelect @bind-Value="registrationModel.EventId" class="form-control">
+                <option value="">-- Select an event --</option>
+                @foreach (var evt in events)
+                {
+                    <option value="@evt.Id">@evt.Name (@evt.Date.ToString("MMM d, yyyy"))</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="() => registrationModel.EventId" />
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Submit Registration</button>
+            <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+        </div>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int? EventId { get; set; }
+
+    private List<Event> events = new();
+    private Event selectedEvent;
+    private bool submitted = false;
+
+    private RegistrationModel registrationModel = new();
+
+    protected override void OnInitialized()
+    {
+        events = EventService.GetAllEvents();
+
+        if (EventId.HasValue)
+        {
+            // Pre-select event if route provided
+            registrationModel.EventId = EventId.Value;
+            selectedEvent = events.FirstOrDefault(e => e.Id == EventId.Value);
+        }
+    }
+
+    private void HandleValidSubmit()
+    {
+        if (!registrationModel.EventId.HasValue || registrationModel.EventId.Value == 0)
+        {
+            return; // validation should catch this
+        }
+
+        RegistrationService.Add(registrationModel.Name, registrationModel.Email, registrationModel.EventId.Value);
+        selectedEvent = events.FirstOrDefault(e => e.Id == registrationModel.EventId.Value);
+        submitted = true;
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+    public class RegistrationModel
+    {
+        [Required]
+        [MinLength(3, ErrorMessage = "Name must be at least 3 characters")]
+        public string Name { get; set; }
+
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Please select an event")]
+        public int? EventId { get; set; }
+    }
+}

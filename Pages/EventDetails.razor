@@ -1,0 +1,75 @@
+@page "/event-details/{EventId:int}"
+@using EventEase.Models
+@using EventEase.Services
+@inject EventService EventService
+@inject UserSessionService SessionService
+@inject NavigationManager Navigation
+
+<PageTitle>@(currentEvent?.Name ?? "Event Details")</PageTitle>
+
+<div class="details-container">
+    @if (currentEvent == null)
+    {
+        <div class="error-message">
+            <h2>Event not found</h2>
+            <p>The event you're looking for doesn't exist.</p>
+            <a href="/" class="btn btn-secondary">Back to Home</a>
+        </div>
+    }
+    else
+    {
+        <div class="event-details">
+            <div class="details-header">
+                <button class="btn btn-secondary" @onclick="GoBack">← Back</button>
+            </div>
+
+            <div class="details-content">
+                <h1>@currentEvent.Name</h1>
+
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <label class="detail-label">📅 Date</label>
+                        <p class="detail-value">@currentEvent.Date.ToString("MMMM dd, yyyy")</p>
+                    </div>
+
+                    <div class="detail-item">
+                        <label class="detail-label">📍 Location</label>
+                        <p class="detail-value">@currentEvent.Location</p>
+                    </div>
+
+                    <div class="detail-item full-width">
+                        <label class="detail-label">📝 Description</label>
+                        <p class="detail-value description">@currentEvent.Description</p>
+                    </div>
+                </div>
+
+                <div class="details-footer">
+                    <a href="@($"register/{currentEvent.Id}")" class="btn btn-primary btn-large">Register for Event</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int EventId { get; set; }
+
+    private Event currentEvent;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SessionService.InitializeAsync();
+        currentEvent = EventService.GetEventById(EventId);
+        
+        if (currentEvent != null)
+        {
+            await SessionService.AddRecentlyViewedEventAsync(EventId);
+        }
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/");
+    }
+}
